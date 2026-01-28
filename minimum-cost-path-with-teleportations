@@ -1,0 +1,52 @@
+from typing import List
+import heapq
+from collections import defaultdict
+
+class Solution:
+    def minCost(self, grid: List[List[int]], k: int) -> int:
+        m, n = len(grid), len(grid[0])
+        INF = 10**15
+        
+        pos = defaultdict(list)
+        for i in range(m):
+            for j in range(n):
+                pos[grid[i][j]].append((i, j))
+        
+        values = sorted(pos.keys())
+        
+        dist = [[[INF] * (k + 1) for _ in range(n)] for _ in range(m)]
+        dist[0][0][0] = 0
+        
+        used = [0] * (k + 1)
+        pq = [(0, 0, 0, 0)]
+        
+        while pq:
+            cost, i, j, t = heapq.heappop(pq)
+            if cost != dist[i][j][t]:
+                continue
+            
+            if i == m - 1 and j == n - 1:
+                return cost
+            
+            if i + 1 < m:
+                nc = cost + grid[i + 1][j]
+                if nc < dist[i + 1][j][t]:
+                    dist[i + 1][j][t] = nc
+                    heapq.heappush(pq, (nc, i + 1, j, t))
+            
+            if j + 1 < n:
+                nc = cost + grid[i][j + 1]
+                if nc < dist[i][j + 1][t]:
+                    dist[i][j + 1][t] = nc
+                    heapq.heappush(pq, (nc, i, j + 1, t))
+            
+            if t < k:
+                v = grid[i][j]
+                while used[t] < len(values) and values[used[t]] <= v:
+                    for x, y in pos[values[used[t]]]:
+                        if cost < dist[x][y][t + 1]:
+                            dist[x][y][t + 1] = cost
+                            heapq.heappush(pq, (cost, x, y, t + 1))
+                    used[t] += 1
+        
+        return -1
