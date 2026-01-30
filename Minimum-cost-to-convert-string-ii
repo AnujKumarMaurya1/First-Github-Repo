@@ -1,0 +1,49 @@
+from typing import List
+import collections
+
+class Solution:
+    def minimumCost(self, source: str, target: str, original: List[str], changed: List[str], cost: List[int]) -> int:
+        n = len(source)
+        nodes = list(set(original) | set(changed))
+        node_map = {s: i for i, s in enumerate(nodes)}
+        num_nodes = len(nodes)
+        
+        dist = [[float('inf')] * num_nodes for _ in range(num_nodes)]
+        for i in range(num_nodes):
+            dist[i][i] = 0
+            
+        for u, v, c in zip(original, changed, cost):
+            dist[node_map[u]][node_map[v]] = min(dist[node_map[u]][node_map[v]], c)
+            
+        for k in range(num_nodes):
+            for i in range(num_nodes):
+                if dist[i][k] == float('inf'): continue
+                for j in range(num_nodes):
+                    if dist[i][j] > dist[i][k] + dist[k][j]:
+                        dist[i][j] = dist[i][k] + dist[k][j]
+        
+        words_by_len = collections.defaultdict(list)
+        for s in nodes:
+            words_by_len[len(s)].append(s)
+            
+        dp = [float('inf')] * (n + 1)
+        dp[0] = 0
+        
+        for i in range(n):
+            if dp[i] == float('inf'):
+                continue
+                
+            if source[i] == target[i]:
+                dp[i+1] = min(dp[i+1], dp[i])
+            
+            for length in words_by_len:
+                if i + length <= n:
+                    sub_s = source[i : i + length]
+                    sub_t = target[i : i + length]
+                    
+                    if sub_s in node_map and sub_t in node_map:
+                        res = dist[node_map[sub_s]][node_map[sub_t]]
+                        if res != float('inf'):
+                            dp[i + length] = min(dp[i + length], dp[i] + res)
+                            
+        return int(dp[n]) if dp[n] != float('inf') else -1
