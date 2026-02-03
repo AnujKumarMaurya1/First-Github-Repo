@@ -1,0 +1,22 @@
+class Solution:
+    def isTrionic(self, nums: List[int]) -> bool:
+        n = len(nums)
+        if n < 3:
+            return False
+            
+        for p in range(1, n - 1):
+            for q in range(p + 1, n - 1):
+                
+                up1 = all(nums[i] < nums[i+1] for i in range(0, p))
+                if not up1:
+                    continue
+                
+                down = all(nums[i] > nums[i+1] for i in range(p, q))
+                if not down:
+                    continue
+                
+                up2 = all(nums[i] < nums[i+1] for i in range(q, n - 1))
+                if up2:
+                    return True
+                    
+        return False
