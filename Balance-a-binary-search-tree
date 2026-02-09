@@ -1,0 +1,22 @@
+class Solution:
+    def balanceBST(self, root: TreeNode) -> TreeNode:
+        nodes = []
+        
+        def collect(node):
+            if node:
+                collect(node.left)
+                nodes.append(node.val)
+                collect(node.right)
+        
+        def build(left, right):
+            if left > right:
+                return None
+            
+            mid = (left + right) // 2
+            curr = TreeNode(nodes[mid])
+            curr.left = build(left, mid - 1)
+            curr.right = build(mid + 1, right)
+            return curr
+
+        collect(root)
+        return build(0, len(nodes) - 1)
