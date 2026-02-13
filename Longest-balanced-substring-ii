@@ -1,0 +1,45 @@
+class Solution:
+    def longestBalanced(self, s: str) -> int:
+        n = len(s)
+        max_len = 0
+        
+        for char1, char2 in [('a', 'b'), ('b', 'c'), ('a', 'c')]:
+            diff_map = {0: -1}
+            diff = 0
+            for i, char in enumerate(s):
+                if char == char1:
+                    diff += 1
+                elif char == char2:
+                    diff -= 1
+                else:
+                    diff_map = {0: i}
+                    diff = 0
+                    continue
+                
+                if diff in diff_map:
+                    max_len = max(max_len, i - diff_map[diff])
+                else:
+                    diff_map[diff] = i
+
+        three_map = {(0, 0): -1}
+        a_count = b_count = c_count = 0
+        for i, char in enumerate(s):
+            if char == 'a': a_count += 1
+            elif char == 'b': b_count += 1
+            else: c_count += 1
+            
+            state = (a_count - b_count, b_count - c_count)
+            if state in three_map:
+                max_len = max(max_len, i - three_map[state])
+            else:
+                three_map[state] = i
+                
+        streak = 0
+        for i in range(n):
+            if i > 0 and s[i] == s[i-1]:
+                streak += 1
+            else:
+                streak = 1
+            max_len = max(max_len, streak)
+            
+        return max_len
