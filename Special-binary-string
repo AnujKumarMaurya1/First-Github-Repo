@@ -1,0 +1,22 @@
+class Solution:
+    def makeLargestSpecial(self, s: str) -> str:
+        count = 0
+        i = 0
+        res = []
+        
+        for j, char in enumerate(s):
+            if char == '1':
+                count += 1
+            else:
+                count -= 1
+            
+            # When count hits 0, we've found a primitive special string
+            if count == 0:
+                # Recurse on the "inner" part, then wrap it back in 1 and 0
+                inner = self.makeLargestSpecial(s[i + 1:j])
+                res.append("1" + inner + "0")
+                i = j + 1
+        
+        # Sort the special components descending and join
+        res.sort(reverse=True)
+        return "".join(res)
