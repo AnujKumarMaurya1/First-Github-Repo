@@ -1,0 +1,19 @@
+class Solution:
+    def binaryGap(self, n: int) -> int:
+        max_dist = 0
+        last_pos = -1
+        current_pos = 0
+        
+        while n > 0:
+            # Check if the rightmost bit is 1
+            if n & 1:
+                if last_pos != -1:
+                    # Update max_dist with the gap between 1s
+                    max_dist = max(max_dist, current_pos - last_pos)
+                last_pos = current_pos
+            
+            # Shift n to the right and increment position
+            n >>= 1
+            current_pos += 1
+            
+        return max_dist
