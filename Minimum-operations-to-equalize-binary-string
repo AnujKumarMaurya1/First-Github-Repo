@@ -1,0 +1,45 @@
+from collections import deque
+import bisect
+
+class Solution:
+    def minOperations(self, s: str, k: int) -> int:
+        n = len(s)
+        start_zeros = s.count('0')
+        if start_zeros == 0:
+            return 0
+        
+        # Separate unvisited numbers by parity
+        # This allows us to quickly find numbers in the [low, high] range
+        unvisited_even = [i for i in range(0, n + 1, 2) if i != start_zeros]
+        unvisited_odd = [i for i in range(1, n + 1, 2) if i != start_zeros]
+        
+        queue = deque([(start_zeros, 0)])
+        
+        while queue:
+            zeros, steps = queue.popleft()
+            
+            # Theoretical range of next zero counts
+            low = abs(zeros - k)
+            high = n - abs(n - (zeros + k))
+            
+            # Pick the correct parity list
+            # If (zeros + k) is even, next_zeros must be even.
+            target_list = unvisited_even if (zeros + k) % 2 == 0 else unvisited_odd
+            
+            # Find the range of indices in the sorted unvisited list 
+            # that fall between 'low' and 'high'
+            left_idx = bisect.bisect_left(target_list, low)
+            right_idx = bisect.bisect_right(target_list, high)
+            
+            # Process all unvisited counts in this range
+            for i in range(left_idx, right_idx):
+                next_zeros = target_list[i]
+                if next_zeros == 0:
+                    return steps + 1
+                queue.append((next_zeros, steps + 1))
+            
+            # Crucial Step: Delete the processed range from the unvisited list
+            # This ensures we NEVER check these numbers again, making it true O(N)
+            del target_list[left_idx:right_idx]
+                    
+        return -1
