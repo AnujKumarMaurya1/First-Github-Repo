@@ -1,0 +1,16 @@
+class Solution:
+    def maxProfit(self, prices: list[int]) -> int:
+        buy1 = buy2 = float('inf')
+        sell1 = sell2 = 0
+        
+        for price in prices:
+            # First transaction: standard buy/sell logic
+            buy1 = min(buy1, price)
+            sell1 = max(sell1, price - buy1)
+            
+            # Second transaction: reinvesting profit from sell1
+            # We treat (price - sell1) as our "effective" second buy cost
+            buy2 = min(buy2, price - sell1)
+            sell2 = max(sell2, price - buy2)
+            
+        return sell2
