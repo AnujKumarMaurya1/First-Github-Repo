@@ -1,0 +1,27 @@
+class Solution:
+    def minFlips(self, s: str) -> int:
+        n = len(s)
+        s_double = s + s
+        
+        target1 = "" # Pattern 0101...
+        target2 = "" # Pattern 1010...
+        for i in range(len(s_double)):
+            target1 += "0" if i % 2 == 0 else "1"
+            target2 += "1" if i % 2 == 0 else "0"
+            
+        diff1 = 0
+        diff2 = 0
+        ans = float('inf')
+        
+        for i in range(len(s_double)):
+            if s_double[i] != target1[i]: diff1 += 1
+            if s_double[i] != target2[i]: diff2 += 1
+            
+            if i >= n:
+                if s_double[i - n] != target1[i - n]: diff1 -= 1
+                if s_double[i - n] != target2[i - n]: diff2 -= 1
+            
+            if i >= n - 1:
+                ans = min(ans, diff1, diff2)
+                
+        return ans
