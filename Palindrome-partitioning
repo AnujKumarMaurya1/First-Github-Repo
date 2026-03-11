@@ -1,0 +1,18 @@
+class Solution:
+    def partition(self, s: str) -> list[list[str]]:
+        results = []
+        
+        def explore(start, path):
+            if start == len(s):
+                results.append(list(path))
+                return
+            
+            for end in range(start + 1, len(s) + 1):
+                chunk = s[start:end]
+                if chunk == chunk[::-1]:
+                    path.append(chunk)
+                    explore(end, path)
+                    path.pop()
+                    
+        explore(0, [])
+        return results
