@@ -1,0 +1,69 @@
+class DSU:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.count = n
+
+    def find(self, i):
+        if self.parent[i] == i:
+            return i
+        self.parent[i] = self.find(self.parent[i])
+        return self.parent[i]
+
+    def union(self, i, j):
+        root_i, root_j = self.find(i), self.find(j)
+        if root_i != root_j:
+            self.parent[root_i] = root_j
+            self.count -= 1
+            return True
+        return False
+
+class Solution:
+    def maxStability(self, n: int, edges: list[list[int]], k: int) -> int:
+        def can_form_tree(threshold):
+            dsu = DSU(n)
+            edges_count = 0
+            
+            mandatory = []
+            optional_free = []
+            optional_upgrade = []
+            
+            for u, v, s, must in edges:
+                if must == 1:
+                    if s < threshold:
+                        return False
+                    mandatory.append((u, v))
+                else:
+                    if s >= threshold:
+                        optional_free.append((u, v))
+                    elif s * 2 >= threshold:
+                        optional_upgrade.append((u, v))
+            
+            for u, v in mandatory:
+                if not dsu.union(u, v):
+                    return False
+                edges_count += 1
+                
+            for u, v in optional_free:
+                if dsu.union(u, v):
+                    edges_count += 1
+                    
+            upgrades_remaining = k
+            for u, v in optional_upgrade:
+                if upgrades_remaining > 0 and dsu.union(u, v):
+                    edges_count += 1
+                    upgrades_remaining -= 1
+            
+            return edges_count == n - 1
+
+        low, high = 1, 200000
+        result = -1
+        
+        while low <= high:
+            mid = (low + high) // 2
+            if can_form_tree(mid):
+                result = mid
+                low = mid + 1
+            else:
+                high = mid - 1
+                
+        return result
