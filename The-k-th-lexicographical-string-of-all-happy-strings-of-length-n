@@ -1,0 +1,22 @@
+class Solution:
+    def getHappyString(self, n: int, k: int) -> str:
+        results = []
+        
+        def build(path):
+            if len(results) == k:
+                return
+            
+            if len(path) == n:
+                results.append(path)
+                return
+            
+            for char in ['a', 'b', 'c']:
+                if not path or char != path[-1]:
+                    build(path + char)
+        
+        build("")
+        
+        if len(results) < k:
+            return ""
+            
+        return results[k-1]
