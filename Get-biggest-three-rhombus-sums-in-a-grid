@@ -1,0 +1,28 @@
+class Solution:
+    def getBiggestThree(self, grid: list[list[int]]) -> list[int]:
+        m, n = len(grid), len(grid[0])
+        distinct_sums = set()
+        
+        for r in range(m):
+            for c in range(n):
+                distinct_sums.add(grid[r][c])
+                
+                for s in range(1, max(m, n)):
+                    top = r - s
+                    bottom = r + s
+                    left = c - s
+                    right = c + s
+                    
+                    if top < 0 or bottom >= m or left < 0 or right >= n:
+                        break
+                    
+                    curr_sum = 0
+                    for i in range(s):
+                        curr_sum += grid[top + i][c + i]      # Top-Right edge
+                        curr_sum += grid[r + i][right - i]    # Right-Bottom edge
+                        curr_sum += grid[bottom - i][c - i]   # Bottom-Left edge
+                        curr_sum += grid[r - i][left + i]     # Left-Top edge
+                        
+                    distinct_sums.add(curr_sum)
+        
+        return sorted(list(distinct_sums), reverse=True)[:3]
