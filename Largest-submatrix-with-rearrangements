@@ -1,0 +1,17 @@
+class Solution:
+    def largestSubmatrix(self, matrix: List[int]) -> int:
+        m = len(matrix)
+        n = len(matrix[0])
+        ans = 0
+        
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] != 0 and i > 0:
+                    matrix[i][j] += matrix[i-1][j]
+            
+            curr_row = sorted(matrix[i], reverse=True)
+            
+            for idx, height in enumerate(curr_row):
+                ans = max(ans, height * (idx + 1))
+                
+        return ans
