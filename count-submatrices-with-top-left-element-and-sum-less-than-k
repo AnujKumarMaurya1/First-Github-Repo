@@ -1,0 +1,20 @@
+class Solution:
+    def countSubmatrices(self, grid: List[List[int]], k: int) -> int:
+        rows = len(grid)
+        cols = len(grid[0])
+        total_count = 0
+        
+        for r in range(rows):
+            for c in range(cols):
+                top = grid[r-1][c] if r > 0 else 0
+                left = grid[r][c-1] if c > 0 else 0
+                diagonal = grid[r-1][c-1] if (r > 0 and c > 0) else 0
+                
+                grid[r][c] += top + left - diagonal
+                
+                if grid[r][c] <= k:
+                    total_count += 1
+                else:
+                    break
+                    
+        return total_count
