@@ -1,0 +1,20 @@
+class Solution:
+    def constructProductMatrix(self, grid: List[List[int]]) -> List[List[int]]:
+        n = len(grid)
+        m = len(grid[0])
+        p = [[0] * m for _ in range(n)]
+        mod = 12345
+        
+        curr = 1
+        for i in range(n):
+            for j in range(m):
+                p[i][j] = curr
+                curr = (curr * grid[i][j]) % mod
+        
+        curr = 1
+        for i in range(n - 1, -1, -1):
+            for j in range(m - 1, -1, -1):
+                p[i][j] = (p[i][j] * curr) % mod
+                curr = (curr * grid[i][j]) % mod
+                
+        return p
