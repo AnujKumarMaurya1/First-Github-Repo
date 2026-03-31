@@ -1,0 +1,49 @@
+class Solution:
+    def generateString(self, str1: str, str2: str) -> str:
+        n, m = len(str1), len(str2)
+        word_len = n + m - 1
+        res = [None] * word_len
+        fixed = [False] * word_len
+        
+        # 1. Fill 'T' constraints
+        for i in range(n):
+            if str1[i] == 'T':
+                for j in range(m):
+                    if res[i + j] is not None and res[i + j] != str2[j]:
+                        return ""
+                    res[i + j] = str2[j]
+                    fixed[i + j] = True
+
+        # 2. Fill remaining with 'a'
+        for i in range(word_len):
+            if res[i] is None:
+                res[i] = 'a'
+        
+        # 3. Fix 'F' violations greedily
+        # We process left to right. If we find a match where str1[i] == 'F'
+        for i in range(n):
+            if str1[i] == 'F':
+                # Check if current substring matches str2
+                match = True
+                for j in range(m):
+                    if res[i + j] != str2[j]:
+                        match = False
+                        break
+                
+                # If it matches, we must break it
+                if match:
+                    broken = False
+                    # Try changing the LAST non-fixed character in this window to 'b'
+                    # Changing the last one preserves lexicographical smallness best
+                    for j in range(m - 1, -1, -1):
+                        if not fixed[i + j]:
+                            # If it was 'a', make it 'b'. If 'b', make it 'c' (rare)
+                            res[i + j] = 'b' if res[i + j] == 'a' else 'c'
+                            broken = True
+                            break
+                    
+                    if not broken:
+                        # All characters in this 'F' window were fixed by 'T's
+                        return ""
+                        
+        return "".join(res)
