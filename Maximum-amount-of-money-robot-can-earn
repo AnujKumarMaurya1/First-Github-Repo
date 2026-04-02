@@ -1,0 +1,39 @@
+class Solution:
+    def maximumAmount(self, coins: List[List[int]]) -> int:
+        m = len(coins)
+        n = len(coins[0])
+        
+        dp = [[[float('-inf')] * 3 for _ in range(n)] for _ in range(m)]
+        
+        first_val = coins[0][0]
+        dp[0][0][0] = first_val
+        if first_val < 0:
+            dp[0][0][1] = 0
+            
+        for r in range(m):
+            for c in range(n):
+                for k in range(3):
+                    current_profit = dp[r][c][k]
+                    
+                    if current_profit == float('-inf'):
+                        continue
+                        
+                    for dr, dc in [(0, 1), (1, 0)]:
+                        nr, nc = r + dr, c + dc
+                        
+                        if 0 <= nr < m and 0 <= nc < n:
+                            next_val = coins[nr][nc]
+                            
+                            if current_profit + next_val > dp[nr][nc][k]:
+                                dp[nr][nc][k] = current_profit + next_val
+                            
+                            if k < 2 and next_val < 0:
+                                if current_profit > dp[nr][nc][k+1]:
+                                    dp[nr][nc][k+1] = current_profit
+                                    
+        res = dp[m-1][n-1]
+        max_val = res[0]
+        if res[1] > max_val: max_val = res[1]
+        if res[2] > max_val: max_val = res[2]
+        
+        return max_val
