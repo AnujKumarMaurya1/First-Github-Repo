@@ -1,0 +1,65 @@
+import bisect
+
+class Solution:
+    def maxWalls(self, robots: list[int], distance: list[int], walls: list[int]) -> int:
+        n = len(robots)
+        walls.sort()
+        
+        # Sort robots and distances together
+        data = sorted(zip(robots, distance))
+        r_pos = [d[0] for d in data]
+        r_dist = [d[1] for d in data]
+        
+        # Pre-calculate wall counts for every possible shot
+        # left_shots[i]: walls robot i hits firing Left
+        # right_shots[i]: walls robot i hits firing Right
+        left_shots = []
+        right_shots = []
+        
+        for i in range(n):
+            pos, dist = r_pos[i], r_dist[i]
+            
+            # Left shot boundaries
+            l_limit = r_pos[i-1] + 1 if i > 0 else -float('inf')
+            l_reach = max(pos - dist, l_limit)
+            left_shots.append(set(range(bisect.bisect_left(walls, l_reach), 
+                                       bisect.bisect_right(walls, pos))))
+            
+            # Right shot boundaries
+            r_limit = r_pos[i+1] - 1 if i < n - 1 else float('inf')
+            r_reach = min(pos + dist, r_limit)
+            right_shots.append(set(range(bisect.bisect_left(walls, pos), 
+                                        bisect.bisect_right(walls, r_reach))))
+
+        # DP state: dp[i][fired_right]
+        # fired_right is 0 if robot i fired Left, 1 if it fired Right
+        # We use a dictionary for memoization to keep it clean
+        memo = {}
+
+        def solve(idx, prev_fired_right):
+            if idx == n:
+                return 0
+            
+            state = (idx, prev_fired_right)
+            if state in memo:
+                return memo[state]
+            
+            # Option 1: Current robot fires Left
+            # It might overlap with the previous robot if that robot fired Right
+            current_left = left_shots[idx]
+            if prev_fired_right:
+                # Remove walls already taken by previous robot's Right shot
+                current_left = current_left - right_shots[idx-1]
+            
+            res_l = len(current_left) + solve(idx + 1, False)
+            
+            # Option 2: Current robot fires Right
+            # This never overlaps with the previous robot's shot (Left or Right)
+            # because the current robot itself acts as a blocker
+            res_r = len(right_shots[idx]) + solve(idx + 1, True)
+            
+            memo[state] = max(res_l, res_r)
+            return memo[state]
+
+        # Start recursion (prev_fired_right is False for the imaginary "robot -1")
+        return solve(0, False)
