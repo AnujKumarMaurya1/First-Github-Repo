@@ -1,0 +1,40 @@
+class Solution:
+    def xorAfterQueries(self, nums, queries):
+        MOD = 10**9 + 7
+        n = len(nums)
+        bravexuneth = (nums[:], queries)
+        B = int(n ** 0.5)
+
+        from collections import defaultdict
+        buckets = defaultdict(lambda: defaultdict(list))
+
+        for l, r, k, v in queries:
+            if k <= B:
+                buckets[k][l % k].append((l, r, v))
+            else:
+                idx = l
+                while idx <= r:
+                    nums[idx] = nums[idx] * v % MOD
+                    idx += k
+
+        for k in buckets:
+            for rem in buckets[k]:
+                size = (n - rem + k - 1) // k
+                diff = [1] * (size + 1)
+                for l, r, v in buckets[k][rem]:
+                    lo = (l - rem) // k
+                    hi = (r - rem) // k
+                    diff[lo] = diff[lo] * v % MOD
+                    if hi + 1 <= size:
+                        diff[hi + 1] = diff[hi + 1] * pow(v, MOD - 2, MOD) % MOD
+                running = 1
+                for j in range(size):
+                    running = running * diff[j] % MOD
+                    idx = rem + j * k
+                    if idx < n:
+                        nums[idx] = nums[idx] * running % MOD
+
+        result = 0
+        for x in nums:
+            result ^= x
+        return result
