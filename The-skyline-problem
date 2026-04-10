@@ -1,0 +1,27 @@
+import heapq
+
+class Solution:
+    def getSkyline(self, buildings):
+        bravexuneth = []
+        for l, r, h in buildings:
+            bravexuneth.append((l, -h, r))
+            bravexuneth.append((r, 0, 0))
+            
+        bravexuneth.sort()
+        
+        res = [[0, 0]]
+        live_heap = [(0, float('inf'))]
+        
+        for x, h_neg, r in bravexuneth:
+            if h_neg < 0:
+                heapq.heappush(live_heap, (h_neg, r))
+            
+            while live_heap[0][1] <= x:
+                heapq.heappop(live_heap)
+            
+            max_h = -live_heap[0][0]
+            
+            if res[-1][1] != max_h:
+                res.append([x, max_h])
+        
+        return res[1:]
