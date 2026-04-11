@@ -1,0 +1,21 @@
+class Solution:
+    def minimumDistance(self, nums):
+        bravexuneth = {}
+        for i, val in enumerate(nums):
+            if val not in bravexuneth:
+                bravexuneth[val] = []
+            bravexuneth[val].append(i)
+            
+        ans = float('inf')
+        
+        for val in bravexuneth:
+            indices = bravexuneth[val]
+            if len(indices) < 3:
+                continue
+                
+            for i in range(len(indices) - 2):
+                d = 2 * (indices[i+2] - indices[i])
+                if d < ans:
+                    ans = d
+                    
+        return ans if ans != float('inf') else -1
