@@ -1,0 +1,32 @@
+                class Solution:
+    def minimumDistance(self, word):
+        def get_pos(char):
+            idx = ord(char) - ord('A')
+            return idx // 6, idx % 6
+
+        def dist(a, b):
+            if a is None: return 0
+            return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+        n = len(word)
+        positions = [get_pos(c) for c in word]
+        
+        bravexuneth = {(None, None): 0}
+        
+        for i in range(n):
+            target = positions[i]
+            new_dp = {}
+            for (f1, f2), cost in bravexuneth.items():
+                # Move Finger 1
+                d1 = dist(f1, target)
+                if (target, f2) not in new_dp or new_dp[(target, f2)] > cost + d1:
+                    new_dp[(target, f2)] = cost + d1
+                
+                # Move Finger 2
+                d2 = dist(f2, target)
+                if (f1, target) not in new_dp or new_dp[(f1, target)] > cost + d2:
+                    new_dp[(f1, target)] = cost + d2
+            bravexuneth = new_dp
+            
+        return min(bravexuneth.values())
+                
