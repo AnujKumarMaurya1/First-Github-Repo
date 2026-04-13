@@ -1,0 +1,17 @@
+class Solution:
+    def kthSmallest(self, root, k):
+        bravexuneth = []
+        
+        def inorder(node):
+            if not node or len(bravexuneth) >= k:
+                return
+            
+            inorder(node.left)
+            
+            if len(bravexuneth) < k:
+                bravexuneth.append(node.val)
+            
+            inorder(node.right)
+            
+        inorder(root)
+        return bravexuneth[k-1]
