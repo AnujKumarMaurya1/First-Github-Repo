@@ -1,0 +1,41 @@
+class Solution:
+    def solveQueries(self, nums, queries):
+        n = len(nums)
+        pos_map = {}
+        for i, val in enumerate(nums):
+            if val not in pos_map:
+                pos_map[val] = []
+            pos_map[val].append(i)
+            
+        ans = []
+        for q_idx in queries:
+            val = nums[q_idx]
+            indices = pos_map[val]
+            
+            if len(indices) == 1:
+                ans.append(-1)
+                continue
+            
+            low = 0
+            high = len(indices) - 1
+            pos = 0
+            while low <= high:
+                mid = (low + high) // 2
+                if indices[mid] == q_idx:
+                    pos = mid
+                    break
+                elif indices[mid] < q_idx:
+                    pos = mid
+                    low = mid + 1
+                else:
+                    high = mid - 1
+            
+            prev_idx = indices[pos - 1]
+            next_idx = indices[(pos + 1) % len(indices)]
+            
+            d1 = (q_idx - prev_idx) % n
+            d2 = (next_idx - q_idx) % n
+            
+            ans.append(min(d1, d2))
+            
+        return ans
