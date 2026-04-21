@@ -1,0 +1,40 @@
+from collections import defaultdict
+
+class Solution:
+    def minimumHammingDistance(self, source: List[int], target: List[int], allowedSwaps: List[List[int]]) -> int:
+        n = len(source)
+        parent = list(range(n))
+        
+        def find(i):
+            if parent[i] == i:
+                return i
+            parent[i] = find(parent[i])
+            return parent[i]
+        
+        def union(i, j):
+            root_i = find(i)
+            root_j = find(j)
+            if root_i != root_j:
+                parent[root_i] = root_j
+        
+        for a, b in allowedSwaps:
+            union(a, b)
+            
+        components = defaultdict(list)
+        for i in range(n):
+            components[find(i)].append(i)
+            
+        matches = 0
+        for group in components.values():
+            counts = {}
+            for idx in group:
+                val = source[idx]
+                counts[val] = counts.get(val, 0) + 1
+            
+            for idx in group:
+                val = target[idx]
+                if counts.get(val, 0) > 0:
+                    counts[val] -= 1
+                    matches += 1
+                    
+        return n - matches
