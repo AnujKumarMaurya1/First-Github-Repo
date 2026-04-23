@@ -1,0 +1,28 @@
+from collections import defaultdict
+
+class Solution:
+    def distance(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        positions = defaultdict(list)
+        for i, val in enumerate(nums):
+            positions[val].append(i)
+            
+        res = [0] * n
+        
+        for val in positions:
+            idx_list = positions[val]
+            m = len(idx_list)
+            
+            total_sum = sum(idx_list)
+            prefix_sum = 0
+            
+            for i, p in enumerate(idx_list):
+                left_val = i * p - prefix_sum
+                
+                suffix_sum = total_sum - prefix_sum - p
+                right_val = suffix_sum - (m - 1 - i) * p
+                
+                res[p] = left_val + right_val
+                prefix_sum += p
+                
+        return res
