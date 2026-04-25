@@ -1,0 +1,43 @@
+from bisect import bisect_left
+
+class Solution:
+    def maxDistance(self, side: int, points: List[List[int]], k: int) -> int:
+        def get_pos(p):
+            x, y = p
+            if y == 0: return x
+            if x == side: return side + y
+            if y == side: return 3 * side - x
+            return 4 * side - y
+
+        positions = sorted([get_pos(p) for p in points])
+        n = len(positions)
+        perimeter = 4 * side
+        extended = positions + [p + perimeter for p in positions]
+
+        def can_fit(dist):
+            for i in range(n):
+                count = 1
+                last_val = extended[i]
+                curr_idx = i
+                for _ in range(k - 1):
+                    next_idx = bisect_left(extended, last_val + dist, lo=curr_idx + 1)
+                    if next_idx >= i + n:
+                        break
+                    last_val = extended[next_idx]
+                    curr_idx = next_idx
+                    count += 1
+                
+                if count == k and (extended[i] + perimeter - last_val) >= dist:
+                    return True
+            return False
+
+        low, high = 1, perimeter // k
+        ans = 1
+        while low <= high:
+            mid = (low + high) // 2
+            if can_fit(mid):
+                ans = mid
+                low = mid + 1
+            else:
+                high = mid - 1
+        return ans
