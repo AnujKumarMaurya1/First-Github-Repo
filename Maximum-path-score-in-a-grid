@@ -1,0 +1,25 @@
+class Solution:
+    def maxPathScore(self, grid: List[List[int]], k: int) -> int:
+        m, n = len(grid), len(grid[0])
+        dp = [[-1] * (k + 1) for _ in range(n)]
+        dp[0][0] = 0
+        
+        for r in range(m):
+            next_row = [[-1] * (k + 1) for _ in range(n)]
+            for c in range(n):
+                val = grid[r][c]
+                s_inc = val
+                c_inc = 1 if val > 0 else 0
+                
+                for w in range(k + 1):
+                    if dp[c][w] != -1:
+                        if w + c_inc <= k:
+                            next_row[c][w + c_inc] = max(next_row[c][w + c_inc], dp[c][w] + s_inc)
+                    
+                    if c > 0 and next_row[c-1][w] != -1:
+                        if w + c_inc <= k:
+                            next_row[c][w + c_inc] = max(next_row[c][w + c_inc], next_row[c-1][w] + s_inc)
+            dp = next_row
+            
+        res = max(dp[n-1])
+        return res if res != -1 else -1
