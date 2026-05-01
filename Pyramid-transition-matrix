@@ -1,0 +1,34 @@
+from collections import defaultdict
+
+class Solution:
+    def pyramidTransition(self, bottom: str, allowed: List[str]) -> bool:
+        mapping = defaultdict(list)
+        for a in allowed:
+            mapping[a[:2]].append(a[2])
+            
+        memo = {}
+
+        def solve(current_row, next_row):
+            if len(current_row) == 1:
+                return True
+            
+            state = (current_row, next_row)
+            if state in memo:
+                return memo[state]
+            
+            if len(next_row) == len(current_row) - 1:
+                res = solve(next_row, "")
+                memo[state] = res
+                return res
+            
+            pair = current_row[len(next_row):len(next_row) + 2]
+            if pair in mapping:
+                for top in mapping[pair]:
+                    if solve(current_row, next_row + top):
+                        memo[state] = True
+                        return True
+            
+            memo[state] = False
+            return False
+
+        return solve(bottom, "")
