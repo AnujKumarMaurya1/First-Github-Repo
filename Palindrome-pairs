@@ -1,0 +1,24 @@
+class Solution:
+    def palindromePairs(self, words: list[str]) -> list[list[int]]:
+        word_map = {word: i for i, word in enumerate(words)}
+        res = []
+        
+        for i, word in enumerate(words):
+            for j in range(len(word) + 1):
+                prefix = word[:j]
+                suffix = word[j:]
+                
+                # If prefix is a palindrome, we need the reverse of suffix to its left
+                if prefix == prefix[::-1]:
+                    reversed_suffix = suffix[::-1]
+                    if reversed_suffix in word_map and word_map[reversed_suffix] != i:
+                        res.append([word_map[reversed_suffix], i])
+                
+                # If suffix is a palindrome, we need the reverse of prefix to its right
+                # j > 0 prevents duplicate checks for the empty prefix/suffix cases
+                if j < len(word) and suffix == suffix[::-1]:
+                    reversed_prefix = prefix[::-1]
+                    if reversed_prefix in word_map and word_map[reversed_prefix] != i:
+                        res.append([i, word_map[reversed_prefix]])
+                        
+        return res
