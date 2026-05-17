@@ -1,0 +1,25 @@
+import heapq
+
+class Solution:
+    def mostBooked(self, n: int, meetings: list[list[int]]) -> int:
+        meetings.sort()
+        free_rooms = list(range(n))
+        heapq.heapify(free_rooms)
+        active_meetings = []
+        counts = [0] * n
+        
+        for start, end in meetings:
+            while active_meetings and active_meetings[0][0] <= start:
+                _, room = heapq.heappop(active_meetings)
+                heapq.heappush(free_rooms, room)
+                
+            if free_rooms:
+                room = heapq.heappop(free_rooms)
+                counts[room] += 1
+                heapq.heappush(active_meetings, (end, room))
+            else:
+                next_clear, room = heapq.heappop(active_meetings)
+                counts[room] += 1
+                heapq.heappush(active_meetings, (next_clear + (end - start), room))
+                
+        return counts.index(max(counts))
