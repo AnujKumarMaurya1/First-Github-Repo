@@ -1,0 +1,39 @@
+from collections import defaultdict
+import heapq
+
+class Twitter:
+    def __init__(self):
+        self.time = 0
+        self.tweets = defaultdict(list)
+        self.following = defaultdict(set)
+
+    def postTweet(self, userId: int, tweetId: int) -> None:
+        self.tweets[userId].append((self.time, tweetId))
+        self.time += 1
+
+    def getNewsFeed(self, userId: int) -> list[int]:
+        res = []
+        heap = []
+        
+        users = self.following[userId] | {userId}
+        
+        for u in users:
+            if u in self.tweets:
+                t = self.tweets[u]
+                # Sirf aakhri ke 10 tweets hi kafi hain merge karne ke liye
+                for i in range(max(0, len(t) - 10), len(t)):
+                    heapq.heappush(heap, t[i])
+                    if len(heap) > 10:
+                        heapq.heappop(heap)
+                        
+        while heap:
+            res.append(heapq.heappop(heap)[1])
+            
+        return res[::-1]
+
+    def follow(self, followerId: int, followeeId: int) -> None:
+        if followerId != followeeId:
+            self.following[followerId].add(followeeId)
+
+    def unfollow(self, followerId: int, followeeId: int) -> None:
+        self.following[followerId].discard(followeeId)
