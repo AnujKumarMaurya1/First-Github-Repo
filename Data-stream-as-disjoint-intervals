@@ -1,0 +1,34 @@
+import bisect
+
+class SummaryRanges:
+    def __init__(self):
+        self.keys = []
+        self.intervals = {}
+
+    def addNum(self, value: int) -> None:
+        left, right = value, value
+        idx = bisect.bisect_right(self.keys, value)
+        
+        if idx > 0:
+            prev_left = self.keys[idx - 1]
+            prev_right = self.intervals[prev_left]
+            if prev_right >= value:
+                return
+            if prev_right == value - 1:
+                left = prev_left
+                del self.intervals[prev_left]
+                self.keys.pop(idx - 1)
+                idx -= 1
+                
+        if idx < len(self.keys):
+            nxt_left = self.keys[idx]
+            if nxt_left == value + 1:
+                right = self.intervals[nxt_left]
+                del self.intervals[nxt_left]
+                self.keys.pop(idx)
+                
+        bisect.insort(self.keys, left)
+        self.intervals[left] = right
+
+    def getIntervals(self) -> list[list[int]]:
+        return [[k, self.intervals[k]] for k in self.keys]
