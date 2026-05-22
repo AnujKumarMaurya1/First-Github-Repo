@@ -1,0 +1,24 @@
+class Solution:
+    def canCross(self, stones: list[int]) -> bool:
+        stone_set = set(stones)
+        target = stones[-1]
+        memo = set()
+        
+        def dfs(position, last_jump):
+            if position == target:
+                return True
+            if (position, last_jump) in memo:
+                return False
+                
+            for jump in (last_jump - 1, last_jump, last_jump + 1):
+                if jump > 0 and (position + jump) in stone_set:
+                    if dfs(position + jump, jump):
+                        return True
+                        
+            memo.add((position, last_jump))
+            return False
+
+        if stones[1] != 1:
+            return False
+            
+        return dfs(1, 1)
