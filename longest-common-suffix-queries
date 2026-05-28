@@ -1,0 +1,46 @@
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.best_idx = -1
+
+class Solution:
+    def stringIndices(self, wordsContainer: list[str], wordsQuery: list[str]) -> list[int]:
+        root = TrieNode()
+        
+        shortest_len = float('inf')
+        default_idx = -1
+        
+        for i, word in enumerate(wordsContainer):
+            if len(word) < shortest_len:
+                shortest_len = len(word)
+                default_idx = i
+                
+        root.best_idx = default_idx
+        
+        for i, word in enumerate(wordsContainer):
+            curr = root
+            length = len(word)
+            
+            for char in reversed(word):
+                if char not in curr.children:
+                    curr.children[char] = TrieNode()
+                curr = curr.children[char]
+                
+                if curr.best_idx == -1 or length < len(wordsContainer[curr.best_idx]):
+                    curr.best_idx = i
+                    
+        result = []
+        for query in wordsQuery:
+            curr = root
+            ans_idx = root.best_idx
+            
+            for char in reversed(query):
+                if char in curr.children:
+                    curr = curr.children[char]
+                    ans_idx = curr.best_idx
+                else:
+                    break
+                    
+            result.append(ans_idx)
+            
+        return result
