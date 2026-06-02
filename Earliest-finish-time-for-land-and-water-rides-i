@@ -1,0 +1,17 @@
+class Solution:
+    def earliestFinishTime(self, landStartTime: list[int], landDuration: list[int], waterStartTime: list[int], waterDuration: list[int]) -> int:
+        def solve(start_first, duration_first, start_second, duration_second):
+            min_first_end = min(s + d for s, d in zip(start_first, duration_first))
+            
+            min_total_end = float('inf')
+            for s, d in zip(start_second, duration_second):
+                current_end = max(min_first_end, s) + d
+                if current_end < min_total_end:
+                    min_total_end = current_end
+                    
+            return min_total_end
+
+        order1 = solve(landStartTime, landDuration, waterStartTime, waterDuration)
+        order2 = solve(waterStartTime, waterDuration, landStartTime, landDuration)
+        
+        return min(order1, order2)
